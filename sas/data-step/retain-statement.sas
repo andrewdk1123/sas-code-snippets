@@ -27,3 +27,11 @@ DATA EnergyConsumption3;
     SET EnergyConsumption;
     RunningTotal + ActiveEnergyConsumption;
 RUN;
+
+/* Carry-over calculations */
+DATA EnergyConsumption4;
+    SET EnergyConsumption;
+    RETAIN PreviousConsumption;
+    CurrentDifference = ActiveEnergyConsumption - PreviousConsumption;
+    PreviousConsumption = ActiveEnergyConsumption;
+RUN;
