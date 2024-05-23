@@ -15,14 +15,14 @@ DATA EnergyConsumption;
 RUN;
 
 /* Calculate running total */
-/* Using RETAIN */
+/* Using RETAIN statement */
 DATA EnergyConsumption2;
     SET EnergyConsumption;
     RETAIN RunningTotal 0;
     RunningTotal = SUM(RunningTotal, ActiveEnergyConsumption);
 RUN;
 
-/* Using RETAIN */
+/* Using sum statement */
 DATA EnergyConsumption3;
     SET EnergyConsumption;
     RunningTotal + ActiveEnergyConsumption;
