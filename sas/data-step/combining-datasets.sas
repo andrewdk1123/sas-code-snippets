@@ -34,10 +34,19 @@ DATA VerticalConcat;
     SET SetOne SetTwo;
 RUN;
 
-/* One-to-one reading */
-DATA OneToOneReading;
+DATA VerticalConcat2;
+    SET SetOne SetThree;
+RUN;
+
+/* Horizontal concatenation of two data sets */
+DATA HorizontalConcat;
     SET SetOne;
     SET SetTwo;
+RUN;
+
+DATA HorizontalConcat2;
+    SET SetOne;
+    SET SetThree;
 RUN;
 
 /* Interleaving */
@@ -58,13 +67,14 @@ DATA MatchMergeBySet;
 RUN;
 
 /* One-to-one merge */
-DATA OneToOneMerging;
+DATA OneToOneMerge;
     MERGE SetOne SetTwo;
 RUN;
 
 /* Match-merging by MERGE */
-DATA MatchMergeByMerge;
+DATA MatchMerge;
     MERGE SetOne SetThree;
+    BY VarA;
 RUN;
 
 /* UPDATE statement */
@@ -93,22 +103,8 @@ PROC SORT DATA=TransactSet;
     BY VarA;
 RUN;
 
-/* Merge by VarA */
-DATA MergeByVarA;
-    MERGE MasterSet TransactSet;
-    BY VarA;
-RUN;
-
-PROC PRINT DATA=MergeByVarA;
-    TITLE "MERGE by VarA";
-RUN;
-
 /* Update by VarA */
-DATA UpdateByVarA;
+DATA UpdateMaster;
     UPDATE MasterSet TransactSet;
     BY VarA;
-RUN;
-
-PROC PRINT DATA=UpdateByVarA;
-    TITLE "UPDATE by VarA";
 RUN;
