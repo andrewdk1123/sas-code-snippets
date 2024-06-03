@@ -1,4 +1,43 @@
-/* PROC MEANS basics */
+/* PROC FREQ */
+PROC FREQ DATA=SASHELP.CARS;
+    TABLES DriveTrain;
+RUN;
+
+PROC FREQ DATA=SASHELP.CARS;
+    TABLES DriveTrain * Type;
+RUN;
+
+PROC FREQ DATA=SASHELP.CARS;
+    TITLE "Two Contingency Tables";
+    TABLES DriveTrain * Type;
+    TABLES Origin;
+RUN;
+
+PROC FREQ DATA=SASHELP.CARS;
+    TITLE "Contingency table without percentages";
+    TABLES DriveTrain * Type / NOROW NOCOL NOPERCENT;
+RUN;
+
+
+PROC FREQ DATA=SASHELP.CARS;
+    TABLES Cylinders;
+RUN;
+
+/* Binning by PROC FORMAT */
+PROC FORMAT;
+    VALUE Fmt_Price
+          LOW - 30000 = '$'
+          30001 - 60000 = '$$'
+          60001 - 90000 = '$$$'
+          90001 - HIGH = '$$$$';
+RUN;
+
+PROC FREQ DATA=SASHELP.CARS;
+    TABLES MSRP;
+    FORMAT MSRP Fmt_Price.;
+RUN;
+
+/* PROC MEANS */
 DATA MyData;
     INPUT X;
     CARDS;
@@ -10,7 +49,7 @@ DATA MyData;
 5
 ;
 
-/* Observe: 
+/* Note: 
 	PROC MEANS ignores all missing values.
 	Std Dev is the sample standard deviation, not population!
 */
@@ -77,42 +116,18 @@ PROC MEANS DATA=MyData3;
     VAR Y;
 RUN;
 
-/* PROC FREQ basics */
-PROC FREQ DATA=SASHELP.CARS;
-    TABLES DriveTrain;
-RUN;
-
-PROC FREQ DATA=SASHELP.CARS;
-    TABLES DriveTrain * Type;
-RUN;
-
-PROC FREQ DATA=SASHELP.CARS;
-    TITLE "Two Contingency Tables";
-    TABLES DriveTrain * Type;
-    TABLES Origin;
-RUN;
-
-PROC FREQ DATA=SASHELP.CARS;
-    TITLE "Contingency table without percentages";
-    TABLES DriveTrain * Type / NOROW NOCOL NOPERCENT;
-RUN;
-
-
-PROC FREQ DATA=SASHELP.CARS;
-    TABLES Cylinders;
-RUN;
-
+/* PROC FORMAT as BY variable */
 PROC FORMAT;
-    VALUE Price
+    VALUE Fmt_Price
           LOW - 30000 = '$'
           30001 - 60000 = '$$'
           60001 - 90000 = '$$$'
           90001 - HIGH = '$$$$';
 RUN;
 
-PROC FREQ DATA=SASHELP.CARS;
-    TABLES MSRP;
-    FORMAT MSRP Price.;
+PROC MEANS DATA=SASHELP.CARS;
+    CLASS MSRP;
+    FORMAT MSRP Fmt_Price.;
 RUN;
 
 /* PROC TABULATE */
@@ -159,9 +174,7 @@ DATA MyData4;
 ;
 RUN;
 
-/* Excluding all observations with a missing value, 
-six tables, one for each Z value, 
-will be created */ 
+/* Excluding all observations with a missing value, six tables, one for each Z value, will be created */ 
 PROC TABULATE DATA=MyData4;
     Page, row, col
     CLASS Z X Y;
@@ -175,6 +188,20 @@ PROC TABULATE DATA=MyData4 MISSING;
 RUN;
 
 /* Adding statistics */
+/*
+	ALL: 	Adds a row, column, or page total
+	MAX: 	Highest value
+	MIN: 	Lowest value
+	MEAN: 	Mean
+	MEDIAN: Median
+	MODE: 	Mode
+	N: 		Number of non-missing values
+	NMISS: 	Number of missing values
+	PCTN: 	Percentage of observations for each group
+	PCTSUM: Percentage of total represented by each group
+	STDDEV: Sample standard deviation
+	SUM: 	Sum
+*/
 PROC TABULATE DATA=SASHELP.CARS;
     TITLE "Mean MSRP for each DriveTrain and Type";
     VAR MSRP;
@@ -189,7 +216,7 @@ PROC TABULATE DATA=SASHELP.CARS;
     TABLE DriveTrain ALL, MEAN * MSRP * (Type ALL); 
 RUN;
 
-Formatting data cells
+/* Formatting data cells */
 PROC TABULATE DATA=SASHELP.CARS FORMAT=DOLLAR9.2;
     TITLE "Mean MSRP by DriveTrain and Type";
     VAR MSRP;
