@@ -16,19 +16,19 @@ PROC SORT DATA=Employees;
     BY JobTitle MonthsInOffice;
 RUN;
 
-/* PROC PRINT DATA=Employees; */
-/*     TITLE1 'List of Employees'; */
-/*     TITLE2 'Sorted by Title and MonthsInOffice (ASC)'; */
-/* RUN; */
+PROC PRINT DATA=Employees;
+    TITLE1 'List of Employees';
+    TITLE2 'Sorted by Title and MonthsInOffice (ASC)';
+RUN;
 
 PROC SORT DATA=Employees;
     BY JobTitle DESCENDING MonthsInOffice;
 RUN;
 
-/* PROC PRINT DATA=Employees; */
-/*     TITLE1 'List of Employees'; */
-/*     TITLE2 'Sorted by Title (ASC) and MonthsInOffice (DESC)'; */
-/* RUN; */
+PROC PRINT DATA=Employees;
+    TITLE1 'List of Employees';
+    TITLE2 'Sorted by Title (ASC) and MonthsInOffice (DESC)';
+RUN;
 
 /* OUT option */
 /* Import data set */
@@ -42,14 +42,14 @@ PROC SORT DATA=HeightWeight OUT=SortedData;
 RUN;
 
 /* Print original data */
-/* PROC PRINT DATA=HeightWeight; */
-/*     TITLE 'Height and Weight Data (Original)'; */
-/* RUN; */
+PROC PRINT DATA=HeightWeight;
+    TITLE 'Height and Weight Data (Original)';
+RUN;
 
 /* Print sorted data */
-/* PROC PRINT DATA=SortedData; */
-/*     TITLE 'Height and Weight Data (Sorted)'; */
-/* RUN;  */
+PROC PRINT DATA=SortedData;
+    TITLE 'Height and Weight Data (Sorted)';
+RUN; 
 
 /* NODUPKEY option */
 PROC SORT DATA=MyData.Boston OUT=SortedBostonNoDupKey NODUPKEY DUPOUT=DupObs;
@@ -57,21 +57,21 @@ PROC SORT DATA=MyData.Boston OUT=SortedBostonNoDupKey NODUPKEY DUPOUT=DupObs;
 RUN;
 
 /* Print the first 15 observations of the original data */
-/* PROC PRINT DATA=MyData.Boston (OBS=15); */
-/*     TITLE1 "Boston Housing Data"; */
-/*     TITLE2 "Unsorted"; */
-/* RUN; */
-/*  */
+PROC PRINT DATA=MyData.Boston (OBS=15);
+    TITLE1 "Boston Housing Data";
+    TITLE2 "Unsorted";
+RUN;
+
 /* Print the first 15 observations of the modified data */
-/* PROC PRINT DATA=SortedBostonNoDupKey (OBS=15); */
-/*     TITLE1 "Boston Housing Data"; */
-/*     TITLE2 "Sorted by ZN with NODUPKEY Option"; */
-/* RUN; */
+PROC PRINT DATA=SortedBostonNoDupKey (OBS=15);
+    TITLE1 "Boston Housing Data";
+    TITLE2 "Sorted by ZN with NODUPKEY Option";
+RUN;
 
 /* Print the first 15 observations of the duplicated data */
-/* PROC PRINT DATA=DupObs (OBS=15); */
-/*     TITLE "Duplicated Data"; */
-/* RUN;  */
+PROC PRINT DATA=DupObs (OBS=15);
+    TITLE "Duplicated Data";
+RUN; 
 
 /* Create example data set */
 DATA MyData;
@@ -88,9 +88,9 @@ PROC SORT DATA=MyData SORTSEQ=LINGUISTIC (STRENGTH=PRIMARY);
     BY Name;
 RUN;
 
-/* PROC PRINT DATA=MyData; */
-/*     TITLE "Sorted by Name (Case insensitive)"; */
-/* RUN; */
+PROC PRINT DATA=MyData;
+    TITLE "Sorted by Name (Case insensitive)";
+RUN;
 
 /* Create example data set */
 DATA MyData2;
@@ -127,3 +127,33 @@ RUN;
 PROC PRINT DATA=SortWithSuboption;
     TITLE "Sorted by Competitions (Numeric collation)";
 RUN;
+
+/* PROC RANK */
+/* Rank one variable */
+DATA BmwCars;
+    SET SASHELP.CARS;
+    IF Make NE 'BMW' THEN DELETE;
+    KEEP Make Model Type MSRP;
+RUN;
+
+PROC RANK DATA=BmwCars OUT=MsrpRanks;
+    VAR MSRP;
+    RANKS MsrpRanking;
+RUN;
+
+PROC PRINT DATA=MsrpRanks;
+RUN; 
+
+/* Rank by Type */
+PROC SORT DATA=BmwCars;
+    BY Type;
+RUN;
+
+PROC RANK DATA=BmwCars OUT=MsrpRanks;
+    BY Type;
+    VAR MSRP;
+    RANKS MsrpRanking;
+RUN;
+
+PROC PRINT DATA=MsrpRanks;
+RUN; 

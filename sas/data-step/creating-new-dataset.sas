@@ -1,5 +1,4 @@
 /* Creating a new SAS data set by manually entering values */
-
 DATA WorkoutLogs;
     INPUT Timestamp :DATETIME. Exercise $ Reps Sets Weights;
     DATALINES;
@@ -16,7 +15,6 @@ DATA WorkoutLogs;
 RUN;
 
 /* Creating a new SAS data set by referencing an external file */
-
 DATA PowerConsumption;
     INFILE '/home/u63368964/source/household-power-consumption.txt' DLM=';' FIRSTOBS=2;
     INPUT 
@@ -25,15 +23,15 @@ DATA PowerConsumption;
         SubMetering1 SubMetering2 SubMetering3;
 RUN;
 
-/* INFILE options */
-/*
-FIRSTOBS: Specifies the row number from which SAS begins to read data
-OBS: Specifies the row number at which SAS finishes reading data
-ENCODING: Specifies the character encoding of the file
-DLM: Specifies the delimiter
-DSD: Recognizes quoted string with a delimiter as a single value
-MISSOVER: Assign missing values to the remaining variables, if data line runs out of the value
-TRUNCOVER: Treat truncated values as missing values
+/* 
+INFILE options 
+	FIRSTOBS:	Specifies the row number from which SAS begins to read data
+	OBS:		Specifies the row number at which SAS finishes reading data
+	ENCODING:	Specifies the character encoding of the file
+	DLM:		Specifies the delimiter
+	DSD:		Recognizes quoted string with a delimiter as a single value
+	MISSOVER:	Assign missing values to the remaining variables, if data line runs out of the value
+	TRUNCOVER:	Treat truncated values as missing values
 */
 
 DATA HomeAddress;
@@ -45,20 +43,19 @@ RUN;
 
 /* Creating new data set, referencing from another data set */
 /* 
-DROP: Excludes variables from the output dataset
-RENAME: Rename variables in the output dataset
-KEEP: Retain specific variables in the output dataset
+	DROP:	Excludes variables from the output dataset
+	RENAME: Rename variables in the output dataset
+	KEEP:	Retain specific variables in the output dataset
 */
 
 DATA JapaneseAddress;
     SET HomeAddress;
     PostalCode = SUBSTR(Address, 1, 11);
     DROP ID Age Sex;
-    RENAME Name=HouseholderName;
+    RENAME Name = HouseholderName;
 RUN;
 
 /* INPUT statement with column indicators */
-
 DATA StudentGrades;
     INFILE '/home/u63368964/source/student-grades.dat';
     INPUT StudentID $ 1-4 Name $ 6-20 Math Science English;
@@ -70,15 +67,13 @@ DATA StudentGrades2;
 RUN;
 
 /* INPUT statement with pointer controls */
-
 /*
-@n: Relocates cursor to the n-th column
-@'character-string': Relocates cursor right after the string.
-+n: Moves the cursor to the n-th column after the current position.
-/: Moves the cursor to the next line.
-#n: Moves the cursor to the n-th line.
+	@n:		Relocates cursor to the n-th column
+	@'chr': Relocates cursor right after the character string.
+	+n:		Moves the cursor to the n-th column after the current position.
+	/: 		Moves the cursor to the next line.
+	#n: 	Moves the cursor to the n-th line.
 */
-
 DATA JulyTemperatures;
     INFILE '/home/u63368964/source/temperatures.dat';
     INPUT @'State:' State $ 
@@ -109,7 +104,6 @@ DATA MyData;
 RUN;
 
 /* Data informats */
-
 DATA Sales;
     INFILE '/home/u63368964/source/sales.dat';
     INPUT 
@@ -121,21 +115,18 @@ DATA Sales;
 RUN;
 
 /* Colon modifier */
-
 DATA CarSales;
     INFILE '/home/u63368964/source/car-sales.dat';
     INPUT Month Day Year Model :$15. Color :$15. NumSales Price;
 RUN;
 
 /* Ampersand modifier */
-
 DATA DogBreeds;
     INFILE '/home/u63368964/source/dog-breeds.dat';
     INPUT Breed &$50. AvgHeight AvgWeight Temper $;
 RUN;
 
 /* Tilde modifier */
-
 DATA HeightWeights2;
     INFILE '/home/u63368964/source/height-weight-v2.txt' DLM=',' DSD;
     INPUT Name :$15. Age Sex $ Weight Height;

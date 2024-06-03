@@ -1,4 +1,4 @@
-/* Update records high */
+/* Update record high */
 DATA EnergyConsumption;
     INFILE '/home/u63368964/source/household-power-consumption.txt' DLM=';' FIRSTOBS=2;
     INPUT 
@@ -18,7 +18,7 @@ RUN;
 /* Using RETAIN statement */
 DATA EnergyConsumption2;
     SET EnergyConsumption;
-    RETAIN RunningTotal 0;
+    RETAIN RunningTotal -10;
     RunningTotal = SUM(RunningTotal, ActiveEnergyConsumption);
 RUN;
 

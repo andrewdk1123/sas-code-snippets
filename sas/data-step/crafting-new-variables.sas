@@ -14,7 +14,6 @@ DATA WorkoutLogs;
 RUN;
 
 /* Mathematical operations */
-
 DATA OneRepMax;
     SET WorkoutLogs;
     Epley = Weights * (1 + 0.0333 * Reps);
@@ -34,6 +33,7 @@ DATA CarSales;
     SasDate = MDY(SalesMonth, SalesDate, SalesYear);
 RUN;
 
+/* IF-THEN statements */
 /* YYQ function: Returns a SAS date value corresponding to the first day of the specified quarter */
 DATA CarSales;
     INFILE '/home/u63368964/source/car-sales.dat';
@@ -53,6 +53,7 @@ DATA CarSales;
     ELSE CarType = 'Commercial';
 RUN;
 
+/* IF-THEN-DO block */
 DATA CarSales;
     LENGTH Model $10. CarType $10.;
     INFILE '/home/u63368964/source/car-sales.dat';
@@ -76,8 +77,8 @@ RUN;
 
 /* Date interval functions */
 /*
-INTNX('interval', from, n): Adds n-intervals to the from dates.
-INTCK('interval', from, to): Counts number of intervals between from and to dates.
+	INTNX('interval', from, n):		Adds n-intervals to the from dates.
+	INTCK('interval', from, to):	Counts number of intervals between from and to dates.
 */
 DATA Employees;
     INFILE '/home/u63368964/source/employees.csv' FIRSTOBS=2 DLM=',' TRUNCOVER;
@@ -97,7 +98,28 @@ DATA Employees;
 RUN;
 
 /* Character manipulations */
+DATA Employees;
+    INFILE '/home/u63368964/source/employees.csv' FIRSTOBS=2 DLM=',' TRUNCOVER;
+    INPUT 
+        EmployeeID $4. GivenName :$15. SurName :$15. Dob DDMMYY10. 
+        JobTitle :$25. StartDate :DATE10. TerminationDate ?:DATE10.;
+    EmployeeName = TRIM(SurName) || ', ' || GivenName;
+/*     KEEP SurName GivenName EmployeeName; */
+RUN;
 
+PROC FREQ DATA=Employees;
+    TABLES JobTitle;
+RUN;
+
+/* Character comparisons */
+/*
+IBM mainframes (z/OS): 
+	- EBCDIC
+	- Blank < Lowercase letters < Uppercase letters < Numerals
+All others: 
+	- ASCII
+	- Blank < Numerals < Uppercase letters < Lowercase Letters
+*/
 DATA Employees;
     INFILE '/home/u63368964/source/employees.csv' FIRSTOBS=2 DLM=',' TRUNCOVER;
     INPUT 
