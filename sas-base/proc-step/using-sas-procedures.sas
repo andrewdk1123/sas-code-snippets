@@ -40,6 +40,25 @@ PROC MEANS DATA=WineQuality;
     FOOTNOTE;
 RUN;
 
+/* Customizing titles and footnotes */
+/*
+Available options
+	COLOR=: Specifies a color for the text.
+			Colors can be specified either by name (e.g. BLUE) or hexadecimal codes (e.g., '#0000FF')
+			Commonly specifications are: AQUA, BLACK, BLUE, FUCHIA, GREEN, GRAY, LIME, MMAROON, NAVY, OLIVE, PURPLE, RED, SILVER, TEAL, WHITE, YELLOW.
+	BCOLOR=: Specifies a background color for the text. The same color ranges available in the COLOR= option applies.
+	HEIGHT=: Specifies the height of the text. HEIGHT value should be a number with units of PT, IN, or CM. 
+			 E.g., TITLE HEIGHT=12PT 'small ' HEIGHT=.25IN 'Medium ' HEIGHT=1CM 'Large';
+	JUSTTIFY=: Control justification of text strings, which can be either LEFT, CENTER, or RIGHT.
+			   E.g., TITLE JUSTIFY=LEFT 'Left ' JUSTIFY=CENTER 'vs. ' JUSTIFY=RIGHT 'Right';
+	FONT=: Specifies a font for the text. The font specification should be enclosed by quotation marks. The particular set of available fonts depends on your your operating environment. 'Times', 'Arial', 'Helvetica', and 'Courier' works for most cases.
+	BOLD: Makes text bold.
+	ITALIC: Makes text italic.
+*/
+PROC MEANS DATA=WineQuality;
+    TITLE COLOR=RED "This is " ITALIC "my " COLOR=BLUE "title";
+RUN;
+
 /* LABEL statement */
 PROC MEANS DATA=WineQuality;
     TITLE "Descriptive Statistics of the Wine Quality Data Set";
