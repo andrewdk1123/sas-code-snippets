@@ -12,9 +12,9 @@ RUN;
 %LET dsn = WineQuality;
 %LET nobs = 20;
 
-/* PROC PRINT DATA=&dsn (OBS=&nobs); */
-/*     TITLE "First &nobs Rows of &dsn Data"; */
-/* RUN; */
+PROC PRINT DATA=&dsn (OBS=&nobs);
+    TITLE "First &nobs Rows of &dsn Data";
+RUN;
 
 /* Adding text before and after macro variables */
 %LET wine_type = White;
@@ -40,9 +40,9 @@ DATA &wine_type.Wines;
     WHERE Type="&wine_type";
 RUN;
 
-/* PROC FREQ DATA=&wine_type.Wines; */
-/*     TABLES Type; */
-/* RUN; */
+PROC FREQ DATA=&wine_type.Wines;
+    TABLES Type;
+RUN;
 
 /* Double period to escape */
 %LET libref = MyData;
@@ -64,16 +64,16 @@ RUN;
 %LET dsn = NVST;
 %LET n = 5;
 
-/* PROC PRINT DATA=&libref..&dsn.&n; */
-/*     TITLE "&libref..&dsn.&n"; */
-/* RUN; */
+PROC PRINT DATA=&libref..&dsn.&n;
+    TITLE "&libref..&dsn.&n";
+RUN;
 
 /* && will be resolved into & */
 %LET NVST5 = SASHELP.NVST5;
 
-/* PROC PRINT DATA=&&&dsn&n; */
-/*     TITLE "&&&dsn&n"; */
-/* RUN; */
+PROC PRINT DATA=&&&dsn&n;
+    TITLE "&&&dsn&n";
+RUN;
 
 /* Printing Macro Variables in the Log */
 %PUT Libref: &libref;
@@ -101,7 +101,7 @@ Reserved words:
     RUN;
 %MEND head;
 
-/* %head; */
+%head;
 
 /* Macro variable scope */
 %LET global_var = global;
@@ -116,9 +116,9 @@ Reserved words:
 
 %show_scope;
 
-/* %PUT ***** Outside the macro *****; */
-/* %PUT Global Variable: &global_var; */
-/* %PUT Local Variable: &local_var; */
+%PUT ***** Outside the macro *****;
+%PUT Global Variable: &global_var;
+%PUT Local Variable: &local_var;
 
 /* Creating macros with parameters */
 /* Positional parameters */
@@ -132,7 +132,7 @@ Reserved words:
     RUN;
 %MEND stacking_two_datasets;
 
-/* %stacking_two_datasets(SASHELP.NVST1, SASHELP.NVST2); */
+%stacking_two_datasets(SASHELP.NVST1, SASHELP.NVST2);
 
 /* Macros with undetermined positional parameters */
 %MACRO stacking_datasets(ds_list);
@@ -187,3 +187,43 @@ close=* To plot close price on the chart, pass close=
 %MEND stock_chart;    
 
 %stock_chart(ABT, 5, Year, high=, low=);
+
+/* Macros invoking macros */
+%MACRO interleaving_two_datasets(dsn1, dsn2, by_var_list);
+    %sorting_obs(&dsn1, out_dsn1, &by_var_list);
+    %sorting_obs(&dsn2, out_dsn2, &by_var_list);
+    
+    DATA Output;
+        SET out_dsn1 out_dsn2;
+        BY &by_var_list;
+    RUN;
+%MEND interleaving_two_datasets;
+
+%MACRO sorting_obs(input_dsn, output_dsn, by_var_list);
+    PROC SORT DATA=&input_dsn OUT=&output_dsn;
+        BY &by_var_list;
+    RUN;
+%MEND sorting_obs;
+
+%interleaving_two_datasets(SASHELP.NVST1, SASHELP.NVST2, Date);
+
+/* Bad practice: nesting macro definitions */
+%MACRO interleaving_two_datasets(dsn1, dsn2, by_var_list);
+
+    %MACRO sorting_obs(input_dsn, output_dsn, by_var_list);
+        PROC SORT DATA=&input_dsn OUT=&output_dsn;
+            BY &by_var_list;
+        RUN;
+    %MEND sorting_obs;
+    
+    %sorting_obs(&dsn1, out_dsn1, &by_var_list);
+    %sorting_obs(&dsn2, out_dsn2, &by_var_list);
+    
+    DATA Output;
+        SET out_dsn1 out_dsn2;
+        BY &by_var_list;
+    RUN;
+    
+%MEND interleaving_two_datasets;
+
+%interleaving_two_datasets(SASHELP.NVST1, SASHELP.NVST2, Date);
