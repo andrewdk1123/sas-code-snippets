@@ -1,25 +1,5 @@
-/* Import data: wine quality */
-DATA WineQuality;
-    INFILE '/home/u63368964/source/wine-quality.csv' DLM=',' FIRSTOBS=2;
-    INPUT Type $ FixedAcid VolatileAcid CitricAcid
-          ResidualSugar Chlorides 
-          FreeSulfurDioxide TotalSulfurDioxide
-          Density pH Sulphates Alcohol
-          Quality;
-RUN;
-
-/* Defining and using macro variables */
-%LET dsn = WineQuality;
-%LET nobs = 20;
-
-PROC PRINT DATA=&dsn (OBS=&nobs);
-    TITLE "First &nobs Rows of &dsn Data";
-RUN;
-
-/* Adding text before and after macro variables */
-%LET wine_type = White;
-
-DATA WineQuality;
+/* Import data: MyData.WineQuality */
+DATA MyData.WineQuality;
     INFILE '/home/u63368964/source/wine-quality.csv' DLM=',' FIRSTOBS=2;
     INPUT Type $ FixedAcid VolatileAcid CitricAcid
           ResidualSugar Chlorides 
@@ -28,6 +8,18 @@ DATA WineQuality;
           Quality;
     Type = PROPCASE(Type);
 RUN;
+
+/* Defining and using macro variables */
+%LET dsn = WineQuality;
+%LET nobs = 20;
+
+PROC PRINT DATA=&dsn (OBS=&nobs);
+    TITLE1 "First &nobs Rows of &dsn Data";
+    TITLE2 'First &nobs Rows of &dsn Data';
+RUN;
+
+/* Adding text before and after macro variables */
+%LET wine_type = White;
 
 DATA Only&wine_type;
     SET WineQuality;
@@ -40,16 +32,12 @@ DATA &wine_type.Wines;
     WHERE Type="&wine_type";
 RUN;
 
-PROC FREQ DATA=&wine_type.Wines;
-    TABLES Type;
-RUN;
-
 /* Double period to escape */
 %LET libref = MyData;
 %LET dsn = WineQuality;
 %LET batch = White;
 
-DATA &libref..&dsn.&batch;
+DATA &libref..&dsn&batch;
     SET &dsn;
     WHERE Type = "&batch";
 RUN;
@@ -59,16 +47,11 @@ DATA &libref..&dsn.Red;
     WHERE Type <> "&batch";
 RUN;
 
-/* Appending Two Macro Variables to Each Other */
+/* Multiple level resolution */
+/* && will be resolved into & */
 %LET libref = SASHELP;
 %LET dsn = NVST;
 %LET n = 5;
-
-PROC PRINT DATA=&libref..&dsn.&n;
-    TITLE "&libref..&dsn.&n";
-RUN;
-
-/* && will be resolved into & */
 %LET NVST5 = SASHELP.NVST5;
 
 PROC PRINT DATA=&&&dsn&n;
@@ -88,7 +71,70 @@ Reserved words:
 	_LOCAL_: List all macro variables that are accessible only in the current referencing environment.
 	_USER_: List all user-defined macro variables in each referencing environment.
 */
+%PUT _ALL_;
+%PUT _AUTOMATIC_;
+%PUT _GLOBAL_;
+%PUT _LOCAL_;
 %PUT _USER_;
+
+/* Numerical evaluations on macro variables */
+
+/* 
+%EVAL(expressions): Performs integer arithmetic, truncating any fractions.
+*/
+%LET A = 5;
+%LET B = &A + 1;
+%LET C = %EVAL(&B + 1);
+%LET D = %EVAL(&A / 2);
+/* This won't work */
+/* %LET E = %EVAL(&A + 0.2);  */
+
+%PUT A: &A; 
+%PUT B: &B;
+%PUT C: &C;
+%PUT D: &D;
+/* %PUT E: &E; */
+
+/* 
+SYSEVALF(expression, <conversion-type>)
+	<conversion-type>:
+	 - BOOLEAN: 0 if the result of the expression is 0 or missing. Otherwise 1.
+	 - CEIL: Round to next largest whole integer.
+	 - FLOOR: Round to the next smallest whole integer.
+	 - INTEGER: Truncate the decimal fraction.
+*/
+%LET X = 5/3;
+
+%PUT Default: %SYSEVALF(&X);
+%PUT Bool: %SYSEVALF(&X, BOOLEAN);
+%PUT Ceil: %SYSEVALF(&X, CEIL);
+%PUT Floor: %SYSEVALF(&X, FLOOR);
+%PUT Integer: %SYSEVALF(&X, INTEGER);
+
+/* 
+Text functions:     
+	%INDEX(arg1, arg2): Searches arg1 for the first occurrence in arg2. 
+						If there is any, return the position of the first match.
+	%LENGTH(arg): Determines the length of its argument.
+	%SCAN(arg1, arg2, <delimiter>): Searches arg1 for the n-th word (arg2) and return its value.
+									If omitted, the same delimiter for the last DATA step will be used.
+	%SUBSTR(arg, pos, <length>): Substring arg, starting from pos to <length>. 
+								 If omitted, it will return by the end of arg.
+	%UPCASE(arg): Converts all characters in arg to upper case.
+*/
+
+%LET my_pangram = The jovial fox jumps over the lazy dog;
+%LET pos_jumps = %INDEX(%UPCASE(&my_text), JUMPS);
+%LET my_substr = %SUBSTR(&my_pangram, &pos_jumps, %LENGTH(jumps));
+
+%PUT &my_pangram;
+%PUT &pos_jumps;
+%PUT &my_substr;
+
+%LET x = XYZ.ABC/XYY;
+%LET word = %SCAN(&x, 3);
+%LET part = %SCAN(&x, 1, z);
+%PUT WORD is &word and PART is &part;
 
 /* Defining and using macros */
 %LET libref = SASHELP;
