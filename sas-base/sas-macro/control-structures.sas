@@ -86,22 +86,30 @@ RUN;
 %interleaving_two_datasets(SASHELP.NVST1, SASHELP.NVST2, Date);
 
 /* Bad practice: nesting macro definitions */
-%MACRO interleaving_two_datasets(dsn1, dsn2, by_var_list);
+/* %MACRO interleaving_two_datasets(dsn1, dsn2, by_var_list); */
+/*  */
+/*     %MACRO sorting_obs(input_dsn, output_dsn, by_var_list); */
+/*         PROC SORT DATA=&input_dsn OUT=&output_dsn; */
+/*             BY &by_var_list; */
+/*         RUN; */
+/*     %MEND sorting_obs; */
+/*      */
+/*     %sorting_obs(&dsn1, out_dsn1, &by_var_list); */
+/*     %sorting_obs(&dsn2, out_dsn2, &by_var_list); */
+/*      */
+/*     DATA Output; */
+/*         SET out_dsn1 out_dsn2; */
+/*         BY &by_var_list; */
+/*     RUN; */
+/*      */
+/* %MEND interleaving_two_datasets; */
+/*  */
+/* %interleaving_two_datasets(SASHELP.NVST1, SASHELP.NVST2, Date); */
 
-    %MACRO sorting_obs(input_dsn, output_dsn, by_var_list);
-        PROC SORT DATA=&input_dsn OUT=&output_dsn;
-            BY &by_var_list;
-        RUN;
-    %MEND sorting_obs;
-    
-    %sorting_obs(&dsn1, out_dsn1, &by_var_list);
-    %sorting_obs(&dsn2, out_dsn2, &by_var_list);
-    
-    DATA Output;
-        SET out_dsn1 out_dsn2;
-        BY &by_var_list;
-    RUN;
-    
-%MEND interleaving_two_datasets;
+/* MLOGIC and MPRINT options */
+
+OPTIONS MLOGIC MPRINT;
 
 %interleaving_two_datasets(SASHELP.NVST1, SASHELP.NVST2, Date);
+
+OPTIONS NOMLOGIC NOMPRINT;
