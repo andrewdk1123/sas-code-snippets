@@ -82,19 +82,23 @@ RUN;
 */
 DATA Employees;
     INFILE '/home/u63368964/source/employees.csv' FIRSTOBS=2 DLM=',' TRUNCOVER;
+    /* Specifying date value representations */
     FORMAT
-        Dob DATE10. StartDate DATE10. TerminationDate DATE10. TenYearsAnniversary WORDDATE18.;
+        Dob DATE10. StartDate DATE10. EndDate DATE10. TenYearsAnniversary WORDDATE18.;
     INPUT 
         EmployeeID $4. GivenName :$15. SurName :$15. Dob DDMMYY10. 
-        JobTitle :$25. StartDate :DATE10. TerminationDate ?:DATE10.;
-    Age = INTCK('Year', Dob, TODAY()); 
-    IF TerminationDate = '.' THEN DO;
+        JobTitle :$25. StartDate :DATE10. EndDate ?:DATE10.;
+    Age = INTCK('Year', Dob, TODAY());
+    IF EndDate = '.' THEN DO;
         YearsInOffice = INTCK('Year', StartDate, TODAY());
-        TenYearsAnniversary = INTNX('Year', StartDate, 10); 
-        NumDaysToAnniversary = INTCK('Day', StartDate, TenYearsAnniversary); 
+        TenYearsAnniversary = INTNX('Year', StartDate, 10);
+        NumDaysToAnniversary = INTCK('Day', StartDate, TenYearsAnniversary);
         END;
-    ELSE TenureMonths = INTCK('Month', StartDate, ExitDate);
+    ELSE TenureMonths = INTCK('Month', StartDate, EndDate);
     DROP EmployeeID JobTitle;
+RUN;
+
+PROC PRINT DATA=Employees;
 RUN;
 
 /* Character manipulations */
