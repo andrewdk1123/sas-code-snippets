@@ -145,9 +145,8 @@ PROC FREQ DATA=SortByTypeQuality;
     TABLES Type * Quality;
 RUN;
 
-/* Within each wine group, SRS of 5 */
-/* N= must not exceed the number of observations, for any strata*/
-PROC SURVEYSELECT DATA=SortByTypeQuality METHOD=SRS N=5 SEED=1123 OUT=SampleStrata;
+/* Within each wine group, SRS of 10 percent */
+PROC SURVEYSELECT DATA=SortByTypeQuality METHOD=SRS SAMPRATE=0.1 SEED=1123 OUT=SampleStrata;
     TITLE1 "Wine Quality Data";
     TITLE2 "Stratified Sampling";
     STRATA Type Quality;
@@ -183,6 +182,3 @@ RUN;
 
 PROC PRINT DATA=SampleSys;
 RUN;
-
-
-
