@@ -1,4 +1,4 @@
-/* Import data: wine quality */
+/* Import data: WineQuality */
 DATA WineQuality;
     INFILE '/home/u63368964/source/wine-quality.csv' DLM=',' FIRSTOBS=2;
     INPUT Type $ FixedAcid VolatileAcid CitricAcid
@@ -6,6 +6,26 @@ DATA WineQuality;
           FreeSulfurDioxide TotalSulfurDioxide
           Density pH Sulphates Alcohol
           Quality;
+RUN;
+
+PROC CONTENTS DATA=WineQuality;
+PROC PRINT DATA=WineQuality (OBS=20);
+RUN;
+
+/* Import data: EnergyConsumption */
+DATA EnergyConsumption;
+    INFILE '/home/u63368964/source/household-power-consumption.txt' DLM=';' FIRSTOBS=2;
+    INPUT 
+        Date :ANYDTDTE10. Time TIME8. 
+        GlobalActivePower GlobalReactivePower Voltage GlobalIntensity 
+        SubMetering1 SubMetering2 SubMetering3;
+    DateTime=DHMS(Date, 0, 0, Time);
+    FORMAT Date YYMMDD10. Time TIME8. DateTime IS8601DT.;
+    KEEP Date Time DateTime GlobalActivePower;
+RUN;
+
+PROC CONTENTS DATA=EnergyConsumption;
+PROC PRINT DATA=EnergyConsumption (OBS=20);
 RUN;
 
 /* PROC MEANS basics */
@@ -91,4 +111,16 @@ PROC MEANS DATA=WineQuality;
           VolatileAcid = "Volatile Acidity"
           CitricAcid = "Citric Acidity";
     WHERE Type = 'red';
+RUN;
+
+/* Filtering on date */
+PROC MEANS DATA=EnergyConsumption;
+    VAR GlobalActivePower;
+    WHERE Date < '01/Jan/2007'd;
+RUN;
+
+/* Filtering on datetime */
+PROC MEANS DATA=EnergyConsumption;
+    VAR GlobalActivePower;
+    WHERE Date < '01/Jan/2007:15:25:30'dt;
 RUN;
