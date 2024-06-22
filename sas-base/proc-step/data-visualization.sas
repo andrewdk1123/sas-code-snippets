@@ -140,7 +140,7 @@ PROC SGPLOT DATA=SASHELP.CARS;
     VBOX Weight;
 RUN;
 
-Box plot by category
+/* Box plot by category */
 PROC SGPLOT DATA=SASHELP.CARS;
     TITLE "Distribution of Car Weights by Type";
     VBOX Weight / CATEGORY=Type;
