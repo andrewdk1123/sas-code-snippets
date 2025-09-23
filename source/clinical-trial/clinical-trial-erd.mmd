@@ -1,0 +1,56 @@
+erDiagram
+    SITES {
+        int site_id PK
+        varchar site_name
+        varchar city
+        varchar state
+        varchar principal_investigator
+    }
+    
+    DEMOGRAPHICS {
+        int subject_id PK
+        int site_id FK
+        varchar treatment_group
+        int age
+        varchar gender
+        varchar race
+        decimal baseline_weight
+        decimal baseline_hba1c
+        int diabetes_duration
+    }
+    
+    VISITS {
+        int subject_id FK
+        int visit_week
+        date visit_date
+        decimal weight
+        int systolic_bp
+        int diastolic_bp
+        int compliance_pct
+    }
+    
+    LAB_RESULTS {
+        int subject_id FK
+        int visit_week
+        date visit_date
+        decimal hba1c
+        decimal fasting_glucose
+        decimal triglycerides
+        decimal hdl_cholesterol
+        decimal ldl_cholesterol
+    }
+    
+    ADVERSE_EVENTS {
+        int subject_id FK
+        varchar ae_term
+        varchar severity
+        date start_date
+        date end_date
+        varchar related_to_drug
+    }
+    
+    %% Relationships
+    SITES ||--o{ DEMOGRAPHICS : "conducts_trial_for"
+    DEMOGRAPHICS ||--o{ VISITS : "has_visits"
+    DEMOGRAPHICS ||--o{ LAB_RESULTS : "has_lab_tests"
+    DEMOGRAPHICS ||--o{ ADVERSE_EVENTS : "experiences_events"
