@@ -1,0 +1,131 @@
+erDiagram
+    CUSTOMERS {
+        string customer_id PK
+        string customer_name
+        date date_opened
+        string account_type
+        int credit_score
+        int branch_id FK
+        string city
+        string state
+        string phone
+        int age
+        decimal income
+    }
+    
+    BRANCHES {
+        int branch_id PK
+        string branch_name
+        string manager_name
+        string city
+        string state
+        decimal assets
+        int employees
+        string region
+        date opened_date
+    }
+    
+    ACCOUNTS {
+        string account_number PK
+        string customer_id FK
+        string account_type
+        decimal balance
+        decimal interest_rate
+        date open_date
+        string status
+        date last_activity
+    }
+    
+    TRANSACTIONS {
+        string transaction_id PK
+        string account_number FK
+        date transaction_date
+        string transaction_type
+        decimal amount
+        string description
+        string channel
+        decimal fee
+    }
+    
+    LOANS {
+        string loan_id PK
+        string customer_id FK
+        string loan_type
+        decimal principal_amount
+        decimal outstanding_balance
+        decimal interest_rate
+        date loan_date
+        int term_months
+        string status
+        string loan_officer FK
+    }
+    
+    LOAN_PAYMENTS {
+        string payment_id PK
+        string loan_id FK
+        date payment_date
+        decimal payment_amount
+        decimal principal_payment
+        decimal interest_payment
+        decimal remaining_balance
+    }
+    
+    CREDIT_CARDS {
+        string card_id PK
+        string customer_id FK
+        string card_type
+        decimal credit_limit
+        decimal current_balance
+        decimal interest_rate
+        date issue_date
+        string status
+        date payment_due_date
+    }
+    
+    EMPLOYEES {
+        string emp_id PK
+        string emp_name
+        string position
+        int branch_id FK
+        decimal salary
+        date hire_date
+        string manager_id FK
+        string department
+    }
+    
+    ACCOUNT_SUMMARY_RAW {
+        string account_number FK
+        date summary_month
+        decimal opening_balance
+        decimal closing_balance
+        decimal total_deposits
+        decimal total_withdrawals
+        int num_transactions
+        decimal avg_daily_balance
+    }
+
+    %% Relationships
+    CUSTOMERS ||--o{ ACCOUNTS : "has"
+    CUSTOMERS ||--o{ LOANS : "applies_for"
+    CUSTOMERS ||--o{ CREDIT_CARDS : "owns"
+    CUSTOMERS }o--|| BRANCHES : "belongs_to"
+    
+    ACCOUNTS ||--o{ TRANSACTIONS : "generates"
+    ACCOUNTS ||--o{ ACCOUNT_SUMMARY_RAW : "summarized_in"
+    
+    LOANS ||--o{ LOAN_PAYMENTS : "receives"
+    
+    BRANCHES ||--o{ EMPLOYEES : "employs"
+    EMPLOYEES ||--o{ EMPLOYEES : "manages"
+    EMPLOYEES ||--o{ LOANS : "originates"
+    
+    %% Additional relationship notes
+    %% Customer-Branch: Many customers belong to one branch
+    %% Customer-Account: One customer can have many accounts
+    %% Account-Transaction: One account can have many transactions
+    %% Customer-Loan: One customer can have many loans
+    %% Loan-Payment: One loan can have many payments
+    %% Customer-Credit Card: One customer can have many credit cards
+    %% Branch-Employee: One branch can have many employees
+    %% Employee-Employee: Manager relationship (self-referencing)
+    %% Employee-Loan: One loan officer can originate many loans
