@@ -1,0 +1,23 @@
+erDiagram
+    direction LR
+
+    STUDENTS {
+        int student_id PK "Primary Key"
+        varchar name "Student Name"
+        varchar email "Email Address"
+        varchar major "Academic Major"
+        int enrollment_year "Year Enrolled"
+        decimal gpa "Grade Point Average"
+        int course_id FK "Foreign Key to Courses"
+    }
+
+    COURSES {
+        int course_id PK "Primary Key"
+        varchar course_name "Course Title"
+        varchar instructor "Instructor Name"
+        varchar department "Academic Department"
+        int credits "Credit Hours"
+        int max_students "Maximum Class Size"
+    }
+
+    COURSES ||--o{ STUDENTS : "currently enrolled in"
