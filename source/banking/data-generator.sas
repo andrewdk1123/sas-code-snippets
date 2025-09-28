@@ -3,7 +3,7 @@
    ======================================== */
 
 /* 1. CUSTOMERS Table */
-data customers;
+data banking.customers;
     input customer_id $ customer_name &$30. 
           @26 date_of_birth date9. address &$20. 
           @55 phone $8. city :$10. state $ zip_code $ customer_type $3. 
@@ -24,7 +24,7 @@ C010 Mary Thompson       13FEB1987 147 Spruce St      555-0110 Boston    MA 0211
 run;
 
 /* 2. ACCOUNTS Table */
-data accounts;
+data banking.accounts;
     input account_id $ customer_id $ account_type :$12. 
           account_status $ balance interest_rate 
           @47 open_date date9. +1 last_activity_date date9. +1 branch_id $;
@@ -54,7 +54,7 @@ A020 C003 MONEY_MARKET ACTIVE 50000.00 0.04   15MAY2022 24SEP2023 BR001
 run;
 
 /* 3. TRANSACTIONS Table */
-data transactions;
+data banking.transactions;
     input transaction_id $ account_id $ transaction_date date9. 
           transaction_type :$8. amount description &$40. 
           @63 merchant :$25. category :$15. branch_id $;
@@ -89,7 +89,7 @@ T025 A014 26SEP2023 DEBIT -25.00      Subscription            Netflix ENTERTAINM
 run;
 
 /* 4. BRANCHES Table */
-data branches;
+data banking.branches;
     input branch_id $ branch_name &$20. 
           @25 address &$40. city :$10. state $ zip_code $ manager_name &$20. 
           @78 phone $12. +1 open_date date9.;
@@ -103,7 +103,7 @@ BR004 Quincy Center     400 Hancock St   Quincy    MA 02171 Linda Chang      617
 run;
 
 /* 5. LOANS Table */
-data loans;
+data banking.loans;
     input loan_id $ customer_id $ loan_type :$8. 
           principal_amount current_balance interest_rate 
           loan_date date9. +1 maturity_date date9. 
@@ -126,7 +126,7 @@ L010 C008 PERSONAL 3000.00 2750.50 0.105 18JAN2023 18JAN2026 95.25 18 ACTIVE BR0
 run;
 
 /* 6. EMPLOYEE Table (for branch operations) */
-data employees;
+data banking.employees;
     input employee_id $ first_name :$15. last_name :$15. position :$20. 
           @41 branch_id $ salary hire_date date9. 
           manager_id $ department :$15.;
@@ -144,81 +144,3 @@ E009 Lisa Brown       Loan_Officer      BR003 68000.00 12JUL2016 E003 LENDING
 E010 David Wilson     Teller            BR003 44000.00 25NOV2021 E003 OPERATIONS
 ;
 run;
-
-/* ========================================
-   PRACTICE SCENARIOS AND SAMPLE QUERIES
-   ======================================== */
-
-/* EXAMPLE 1: Set Operations - Find customers with both checking and savings accounts */
-proc sql;
-    title "Customers with Both Checking and Savings Accounts (INTERSECT)";
-    select distinct customer_id, customer_name
-    from customers
-    where customer_id in (
-        select customer_id from accounts where account_type = 'CHECKING'
-        intersect
-        select customer_id from accounts where account_type = 'SAVINGS'
-    );
-quit;
-
-/* EXAMPLE 2: Subquery - Find customers with above-average account balances */
-proc sql;
-    title "Customers with Above-Average Account Balances";
-    select c.customer_name, a.account_type, a.balance
-    from customers c, accounts a
-    where c.customer_id = a.customer_id
-    and a.balance > (select avg(balance) from accounts where balance > 0);
-quit;
-
-/* EXAMPLE 3: CTE - Monthly transaction summary with running totals */
-proc sql;
-    title "Monthly Transaction Summary with Running Totals";
-    with monthly_summary as (
-        select 
-            month(transaction_date) as trans_month,
-            year(transaction_date) as trans_year,
-            transaction_type,
-            sum(amount) as monthly_amount,
-            count(*) as transaction_count
-        from transactions
-        group by calculated trans_month, calculated trans_year, transaction_type
-    )
-    select 
-        trans_month,
-        trans_year, 
-        transaction_type,
-        monthly_amount,
-        transaction_count,
-        sum(monthly_amount) over (partition by transaction_type 
-                                 order by trans_year, trans_month) as running_total
-    from monthly_summary
-    order by transaction_type, trans_year, trans_month;
-quit;
-
-/* ========================================
-   ADDITIONAL PRACTICE IDEAS
-   ======================================== */
-
-/*
-SUGGESTED PRACTICE EXERCISES:
-
-1. SET OPERATIONS:
-   - UNION: Combine individual and business customers
-   - EXCEPT: Find customers with loans but no credit cards
-   - INTERSECT: Find branches serving both individual and business customers
-
-2. SUBQUERIES:
-   - Correlated subqueries: Find customers with multiple accounts
-   - EXISTS: Find customers who have made transactions in the last 30 days  
-   - Scalar subqueries: Compare each customer's total balance to branch average
-
-3. CTEs (Common Table Expressions):
-   - Recursive CTEs: Calculate compound interest over time
-   - Multiple CTEs: Customer profitability analysis
-   - Window functions with CTEs: Ranking customers by transaction volume
-
-4. ADVANCED COMBINATIONS:
-   - Risk analysis: Combine loan data with transaction patterns
-   - Customer segmentation: Using account balances, transaction history, and demographics
-   - Branch performance: Compare metrics across different locations
-*/
